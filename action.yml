@@ -1,0 +1,28 @@
+name: "Setup PHP devpack dependencies Action"
+description: "Setup PHP devpack dependencies for Windows"
+
+inputs:
+  version:
+    description: "PHP version to build for"
+    required: true
+  arch:
+    description: "The architecture to build for (x64 or x86)"
+    required: true
+  vs:
+    description: "The Visual Studio version"
+    required: true
+  ignore_vs:
+    description: "Ignore the VS version for PECL dependencies"
+    required: true
+  deps:
+    description: "List of dependency libraries"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "fetch dependencies"
+      id: "deps"
+      shell: powershell
+      run: c:\tools\php\php.exe ${{github.action_path}}\scripts\deps.php --version ${{inputs.version}} --arch ${{inputs.arch}} --vs ${{inputs.vs}} --ignore_vs ${{inputs.ignore_vs}} --deps "${{inputs.deps}}"
+#      run: ${{github.action_path}}\scripts\deps.ps1 -version ${{inputs.version}} -arch ${{inputs.arch}} -vs ${{inputs.vs}} -ignore_vs ${{inputs.ignore_vs}} -deps ${{inputs.deps}}
