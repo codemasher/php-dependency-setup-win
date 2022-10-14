@@ -14,15 +14,31 @@ inputs:
   ignore_vs:
     description: "Ignore the VS version for PECL dependencies"
     required: true
-  deps:
-    description: "List of dependency libraries"
-    required: true
 
 runs:
   using: "composite"
   steps:
-    - name: "fetch dependencies"
-      id: "deps"
+    - name: "check dependencies"
+      id: "check"
       shell: powershell
-      run: c:\tools\php\php.exe ${{github.action_path}}\scripts\deps.php --version ${{inputs.version}} --arch ${{inputs.arch}} --vs ${{inputs.vs}} --ignore_vs ${{inputs.ignore_vs}} --deps "${{inputs.deps}}"
+      run: c:\tools\php\php.exe ${{github.action_path}}\scripts\deps.php --version ${{inputs.version}} --arch ${{inputs.arch}} --vs ${{inputs.vs}} --ignore_vs ${{inputs.ignore_vs}}
 #      run: ${{github.action_path}}\scripts\deps.ps1 -version ${{inputs.version}} -arch ${{inputs.arch}} -vs ${{inputs.vs}} -ignore_vs ${{inputs.ignore_vs}} -deps ${{inputs.deps}}
+
+    - name: "Setup cache"
+      id: "cache"
+      uses: actions/cache@v3
+      with:
+        path: ${{steps.check.outputs.deps}}
+        key: ${{steps.check.outputs.cachekey}}
+
+    - name: "download dependencies"
+      if: steps.cache.outputs.cache-hit != 'true'
+      id: "download"
+      shell: powershell
+      run: c:\tools\php\php.exe ${{github.action_path}}\scripts\download.php
+
+    - name: "check paths"
+      id: "paths"
+      shell: powershell
+      run: |
+        Get-ChildItem -Path ${{steps.check.outputs.deps}}
