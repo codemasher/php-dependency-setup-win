@@ -18,7 +18,7 @@
 
 require_once __DIR__.'/common.php';
 
-$deps_download = ACTION_DOWNLOADS.'\\deps_download.json';
+$deps_download = ACTION_TOOLKIT_TMP.'\\deps_download.json';
 
 if(!file_exists($deps_download) || !is_file($deps_download) || !is_readable($deps_download)){
 	throw new InvalidArgumentException('cannot read deps_download.json');
@@ -33,13 +33,13 @@ if(empty($download)){
 $downloaded = [];
 foreach($download as $dep => $dl){
 	// IDGAF
-	$data = download_file($dl->url);
+	$data = $toolkit->fetchFromURL($dl->url);
 
 	if(empty($data)){
 		throw new RuntimeException('download error: '.$dl->url);
 	}
 
-	file_put_contents(ACTION_DOWNLOADS.'\\'.$dl->filename, $data);
+	file_put_contents(ACTION_TOOLKIT_TMP.'\\'.$dl->filename, $data);
 
 	echo "downloaded: $dl->url\n";
 	$downloaded[$dep] = $dl->filename;
@@ -49,7 +49,7 @@ $extracted = [];
 
 foreach($downloaded as $file){
 
-	if(!unzip_file(ACTION_DOWNLOADS.'\\'.$file, SDK_BUILD_DEPS)){
+	if(!unzip_file(ACTION_TOOLKIT_TMP.'\\'.$file, SDK_BUILD_DEPS)){
 		continue;
 	}
 

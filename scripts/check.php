@@ -21,7 +21,7 @@ foreach($args as $k => $v){
 	${strtolower($k)} = trim($v);
 }
 
-$deps_json = ACTION_DOWNLOADS.'\\deps.json';
+$deps_json = ACTION_TOOLKIT_TMP.'\\deps.json';
 
 if(!file_exists($deps_json) || !is_file($deps_json) || !is_readable($deps_json)){
 	throw new InvalidArgumentException('cannot read deps.json');
@@ -97,7 +97,7 @@ if(!empty($diff)){
 	throw new RuntimeException('could not fetch the following libraries: '.implode(', ', $diff));
 }
 
-$deps_download = ACTION_DOWNLOADS.'\\deps_download.json';
+$deps_download = ACTION_TOOLKIT_TMP.'\\deps_download.json';
 file_put_contents($deps_download, json_encode($download));
 
 $out_vars = [

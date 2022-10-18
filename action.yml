@@ -18,6 +18,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+
+    - name: "Setup GH Actions Toolkit"
+      id: "toolkit"
+      uses: codemasher/php-github-actions-toolkit@dev
+
     - name: "check dependencies"
       id: "check"
       shell: powershell
