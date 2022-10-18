@@ -49,7 +49,7 @@ $extracted = [];
 
 foreach($downloaded as $file){
 
-	if(!unzip_file(ACTION_TOOLKIT_TMP.'\\'.$file, SDK_BUILD_DEPS)){
+	if(!$toolkit->unzip(ACTION_TOOLKIT_TMP.'\\'.$file, SDK_BUILD_DEPS)){
 		continue;
 	}
 

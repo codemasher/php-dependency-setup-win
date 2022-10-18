@@ -106,9 +106,6 @@ $out_vars = [
 	'deps'          => SDK_BUILD_DEPS,
 ];
 
-// @todo https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/
-foreach($out_vars as $name => $value){
-	echo "::set-output name=$name::$value\n";
-}
+$toolkit->outputVars($out_vars);
 
 exit(0);
