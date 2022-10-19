@@ -2,21 +2,17 @@
 /**
  * deps.php
  *
- * PHP 7.0 compatible, just in case someone manages to run it with something else
- * than the php shipped with the GH actions runner...
- *
- * (we have cURL and OpenSSL, so all good!)
- * @see https://github.com/actions/runner-images/blob/main/images/win/scripts/Installers/Install-PHP.ps1
- *
- * c:\tools\php\php.exe scripts/deps.php --version 8.2 --vs vs16 --arch x64 --deps "liblzma libzip zlib "
- *
  * @created      11.10.2022
  * @author       smiley <smiley@chillerlan.net>
  * @copyright    2022 smiley
  * @license      MIT
  */
 
-require_once __DIR__.'/common.php';
+require_once $_SERVER['GITHUB_WORKSPACE'].'/.github/github_actions_toolkit.php';
+
+$toolkit = new \GitHubActionsToolkit;
+
+define('ACTION_TOOLKIT_TMP', $toolkit->getActionTmp());
 
 $deps_download = ACTION_TOOLKIT_TMP.'\\deps_download.json';
 
@@ -45,11 +41,12 @@ foreach($download as $dep => $dl){
 	$downloaded[$dep] = $dl->filename;
 }
 
+$deps      = realpath($toolkit->getWorkspaceRoot().'\\..').'\\deps';
 $extracted = [];
 
 foreach($downloaded as $file){
 
-	if(!$toolkit->unzip(ACTION_TOOLKIT_TMP.'\\'.$file, SDK_BUILD_DEPS)){
+	if(!$toolkit->unzip(ACTION_TOOLKIT_TMP.'\\'.$file, $deps)){
 		continue;
 	}
 

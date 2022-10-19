@@ -8,7 +8,11 @@
  * @license      MIT
  */
 
-require_once __DIR__.'/common.php';
+require_once $_SERVER['GITHUB_WORKSPACE'].'/.github/github_actions_toolkit.php';
+
+$toolkit = new \GitHubActionsToolkit;
+
+define('ACTION_TOOLKIT_TMP', $toolkit->getActionTmp());
 
 $args = getopt('', ['version:', 'vs:', 'arch:', 'ignore_vs:']);
 
@@ -34,6 +38,25 @@ if(empty($deps)){
 }
 
 $ignore_vs = $ignore_vs !== 'false';
+
+
+/**
+ * fetch one of the dependency lists from php.net
+ *
+ * @see https://windows.php.net/downloads/php-sdk/deps/series/
+ * @see https://windows.php.net/downloads/pecl/deps/packages.txt
+ */
+function fetch_deplist(string $package_txt):array{
+	global $toolkit;
+
+	$deplist =  $toolkit->fetchFromURL($package_txt);
+
+	if(empty($deplist)){
+		throw new RuntimeException('invalid package list http response');
+	}
+
+	return array_map('trim', explode("\n", trim($deplist)));
+}
 
 // check core dependencies first
 $baseurl  = 'https://windows.php.net/downloads/php-sdk/deps';
@@ -103,7 +126,7 @@ file_put_contents($deps_download, json_encode($download));
 $out_vars = [
 	'cachekey'      => sha1(implode(' ', array_column($download, 'filename'))),
 	'deps_download' => $deps_download,
-	'deps'          => SDK_BUILD_DEPS,
+	'deps'          => realpath($toolkit->getWorkspaceRoot().'\\..').'\\deps',
 ];
 
 $toolkit->outputVars($out_vars);
