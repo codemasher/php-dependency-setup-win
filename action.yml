@@ -21,7 +21,7 @@ runs:
 
     - name: "Setup GH Actions Toolkit"
       id: "toolkit"
-      uses: codemasher/php-github-actions-toolkit@dev
+      uses: codemasher/php-github-actions-toolkit@main
 
     - name: "check dependencies"
       id: "check"
