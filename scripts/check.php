@@ -8,6 +8,7 @@
  * @license      MIT
  */
 
+#require_once '../vendor/codemasher/php-github-actions-toolkit/src/vendor/autoload.php'; // local
 require_once $_SERVER['GITHUB_WORKSPACE'].'/.github/github_actions_toolkit.php';
 
 $toolkit = new \GitHubActionsToolkit;
@@ -25,7 +26,7 @@ foreach($args as $k => $v){
 	${strtolower($k)} = trim($v);
 }
 
-$deps_json = ACTION_TOOLKIT_TMP.'\\deps.json';
+$deps_json = ACTION_TOOLKIT_TMP.DIRECTORY_SEPARATOR.'deps.json';
 
 if(!file_exists($deps_json) || !is_file($deps_json) || !is_readable($deps_json)){
 	throw new InvalidArgumentException('cannot read deps.json');
@@ -120,13 +121,13 @@ if(!empty($diff)){
 	throw new RuntimeException('could not fetch the following libraries: '.implode(', ', $diff));
 }
 
-$deps_download = ACTION_TOOLKIT_TMP.'\\deps_download.json';
+$deps_download = ACTION_TOOLKIT_TMP.DIRECTORY_SEPARATOR.'deps_download.json';
 file_put_contents($deps_download, json_encode($download));
 
 $out_vars = [
 	'cachekey'      => sha1(implode(' ', array_column($download, 'filename'))),
 	'deps_download' => $deps_download,
-	'deps'          => realpath($toolkit->getWorkspaceRoot().'\\..').'\\deps',
+	'deps'          => realpath($toolkit->getWorkspaceRoot().DIRECTORY_SEPARATOR.'..').DIRECTORY_SEPARATOR.'deps',
 ];
 
 $toolkit->outputVars($out_vars);

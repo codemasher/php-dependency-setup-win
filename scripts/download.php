@@ -8,13 +8,14 @@
  * @license      MIT
  */
 
+#require_once '../vendor/codemasher/php-github-actions-toolkit/src/vendor/autoload.php'; // local
 require_once $_SERVER['GITHUB_WORKSPACE'].'/.github/github_actions_toolkit.php';
 
 $toolkit = new \GitHubActionsToolkit;
 
 define('ACTION_TOOLKIT_TMP', $toolkit->getActionTmp());
 
-$deps_download = ACTION_TOOLKIT_TMP.'\\deps_download.json';
+$deps_download = ACTION_TOOLKIT_TMP.DIRECTORY_SEPARATOR.'deps_download.json';
 
 if(!file_exists($deps_download) || !is_file($deps_download) || !is_readable($deps_download)){
 	throw new InvalidArgumentException('cannot read deps_download.json');
@@ -28,25 +29,21 @@ if(empty($download)){
 
 $downloaded = [];
 foreach($download as $dep => $dl){
-	// IDGAF
-	$data = $toolkit->fetchFromURL($dl->url);
 
-	if(empty($data)){
+	if(!$toolkit->downloadFile($dl->url, ACTION_TOOLKIT_TMP)){
 		throw new RuntimeException('download error: '.$dl->url);
 	}
-
-	file_put_contents(ACTION_TOOLKIT_TMP.'\\'.$dl->filename, $data);
 
 	echo "downloaded: $dl->url\n";
 	$downloaded[$dep] = $dl->filename;
 }
 
-$deps      = realpath($toolkit->getWorkspaceRoot().'\\..').'\\deps';
+$deps      = realpath($toolkit->getWorkspaceRoot().DIRECTORY_SEPARATOR.'..').DIRECTORY_SEPARATOR.'deps';
 $extracted = [];
 
 foreach($downloaded as $file){
 
-	if(!$toolkit->unzip(ACTION_TOOLKIT_TMP.'\\'.$file, $deps)){
+	if(!$toolkit->unzip(ACTION_TOOLKIT_TMP.DIRECTORY_SEPARATOR.$file, $deps)){
 		continue;
 	}
 
